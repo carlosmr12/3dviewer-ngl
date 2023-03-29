@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+        <title>3D-viewer using NGLviewer</title>
+		<!-- CSS  -->
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" integrity="sha512-UJfAaOlIRtdR+0P6C3KUoTDAxVTuy3lnSXLyLKlHYJlcSU8Juge/mjeaxDNMlw9LgeIotgz5FP8eUQPhX1q10A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link href="https://fonts.googleapis.com/css?family=Leckerli+One" rel="stylesheet" type="text/css">
+        <style>
+            .dropdown-content{
+                width: auto !important;
+            }
+            #legendInterface {
+                height: 20px;
+                background: linear-gradient(-90deg, red, white, blue);
+            }
+            .custom-viewer i.left{
+                margin-right:5px;
+            }
+            .custom-viewer {
+                font-size:10px;
+                padding:0 10px;
+            }
+            .custom-viewer.btn-small{
+                padding:0 5px;
+            }
+            #viewerHelper ul{
+                margin-left:40px;
+            }
+            #viewerHelper ul li{
+                list-style-type: disc !important;
+            }
+            
+            #helperTextA ul{
+                margin-left:40px;
+            }
+            #helperTextA ul li{
+                list-style-type: disc !important;
+            }
+            
+        </style>
+	</head>
+	<body>
+		<main>
+			<div class="container">
+				<div class="section">
+					<!--   Icon Section   -->
+					<div class="row" style="margin-bottom:0px;">
+						<div class="col s12 m12 l12">
+							<div class="card">
+								<div class="card-content">
+                                    <div class="row valign-wrapper" style="margin-bottom:0px;">
+                                        <div class="col s12 m12 l12">
+											<span class="card-title">3D molecular viewer using NGLviewer</span>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-bottom:0px;">
+                                        <div class="col s12 m5 l5">
+                                            <div class="row" style="margin-bottom:0px;">
+                                                <div class="col s12 m6 l6 input-field">
+                                                    <select id="setBgViewer">
+                                                        <option value="white" selected>White</option>
+                                                        <option value="black">Black</option>
+                                                    </select>
+                                                    <label>Background</label>
+                                                </div>
+                                                <div class="col s12 m6 l6 input-field">
+                                                    <select id="setStyle" class="tail-select">
+                                                        <option value="cartoon" selected>Cartoon</option>
+                                                        <option value="ball+stick">Ball+stick</option>
+                                                        <option value="licorice">Licorice</option>
+                                                        <option value="spacefill">Spacefill</option>
+                                                    </select>
+                                                    <label>Representation</label>
+                                                </div>
+                                                <div class="col s12 m12 l12 input-field">
+                                                    <select id="setColorScheme" class="tail-select">
+                                                        <option value="hotspot" selected>Interface scores</option>
+                                                        <option value="chainid">Chain</option>
+                                                        <option value="resname">Residue</option>
+                                                        <option value="sstruc">Secondary Structure</option>
+                                                        <option value="hydrophobicity">Hydrophobicity</option>
+                                                    </select>
+                                                    <label>Color by</label>
+                                                </div>
+                                                <div class="input-field col s12 m12 l12">
+                                                    <p>
+                                                        <label>
+                                                            <input id="showSurface" type="checkbox" class="filled-in" name="surface" />
+                                                            <span>Surface <i class="material-icons tooltipped tiny" data-position="bottom" data-tooltip="Adds a surface layer to the protein visualization, with adjustable opacity.">info_outline</i></span>
+                                                        </label>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div id="opacitySurface" class="row threshold-slider" style="display:none;">
+                                                <div class="input-field col s12 m12 l12 margin-bottom-0 margin-top-0">
+                                                    <p class="range-field">
+                                                        <label>Surface Opacity: <span>0.6</span></label>
+                                                        <input type="range" step="0.1" min="0.1" max="1" value="0.6"/>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div id="legendInterfaceRow" class="row" style="display:none;margin-top:5px;">
+                                                <div class="col s12 m12 l12">
+                                                    <div id="legendInterface"></div>
+                                                </div>
+                                                <div class="col m12 margin-bottom-10">
+                                                    <div class="col s6 m6 l6 left-align">Non-interface</div>
+                                                    <div class="col s6 m6 l6 right-align">Interface</div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col s6 m2 l2">
+                                                    <a id="resetViewer" class="waves-effect blue-grey lighten-5 blue-grey-text text-darken-4 btn tooltipped custom-viewer btn-viewer tooltipped" data-position="top" data-tooltip="Reset viewer"><i class="material-icons">refresh</i></a>
+                                                </div>
+                                                <div class="col s6 m2 l2">
+                                                    <a id="spinViewer" class="waves-effect blue-grey lighten-5 blue-grey-text text-darken-4 btn tooltipped custom-viewer btn-viewer tooltipped" data-position="top" data-tooltip="Toggle Spin"><i class="material-icons">loop</i></a>
+                                                </div>
+                                                <div class="col s6 m2 l2">
+                                                    <a id="screenshotViewer" class="waves-effect blue-grey lighten-5 blue-grey-text text-darken-4 btn tooltipped custom-viewer btn-viewer tooltipped" data-position="top" data-tooltip="Screenshot"><i class="material-icons">camera_alt</i></a>
+                                                </div>
+                                                <div class="col s6 m2 l2">
+                                                    <a id="viewerHelper-trigger" class="waves-effect blue-grey lighten-5 blue-grey-text text-darken-4 btn modal-trigger custom-viewer btn-viewer tooltipped" data-position="top" data-tooltip="Help" href="#!"><i class="material-icons">help</i></a>
+                                                </div>
+                                                <div class="col s6 m2 l2">
+                                                    <a id="fullscreenViewer" class="waves-effect blue-grey lighten-5 blue-grey-text text-darken-4 btn custom-viewer btn-viewer tooltipped" data-position="top" data-tooltip="Fullscreen"><i class="material-icons">fullscreen</i></a>
+                                                </div>
+                                                <div class="col s6 m2 l2">
+                                                    <a id="downloadStructure" class="waves-effect blue-grey lighten-5 blue-grey-text text-darken-4 btn custom-viewer btn-viewer tooltipped" data-position="top" data-tooltip="Download annotated structure" href="/csm_potential/get_pdb/ppi_example/protein.pdb"><i class="material-icons">file_download</i></a>
+                                                </div>
+                                            </div>
+											<div class="row">
+												<div class="col s12 m12 l12">
+													<div id="viewerHelper" href="#!" class="hide" style="border:1px solid #e0e0e0;background-color:#eff7fd">
+														<ul>
+															<li><span class="badge" style="font-size:16px;font-weight:bold;float:none;margin-left:0px;color:#424242;border:1px solid #424242;">click + drag</span> - Rotate</li>
+															<li><span class="badge" style="font-size:16px;font-weight:bold;float:none;margin-left:0px;color:#424242;border:1px solid #424242;">right click + drag</span> - Translate</li>
+															<li><span class="badge" style="font-size:16px;font-weight:bold;float:none;margin-left:0px;color:#424242;border:1px solid #424242;">mouse wheel</span> - Zoom</li>
+															<li><span class="badge" style="font-size:16px;font-weight:bold;float:none;margin-left:0px;color:#424242;border:1px solid #424242;">click on structure</span> - Center on clicked region</li>
+														</ul>
+													</div>
+												</div>
+											</div>
+                                        </div>
+                                        <div class="col s12 m7 l7">
+                                            <div id="spinner" class="row">
+                                                <div class="col s12 m12 l12 center-align" style="padding:3px;">
+                                                    <div class="preloader-wrapper big active">
+                                                        <div class="spinner-layer spinner-blue-only">
+                                                            <div class="circle-clipper left">
+                                                                <div class="circle"></div>
+                                                            </div>
+                                                            <div class="gap-patch">
+                                                                <div class="circle"></div>
+                                                            </div>
+                                                            <div class="circle-clipper right">
+                                                                <div class="circle"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col s12 m12 l12 grey lighten-2" style="padding:3px;">
+                                                    <div id="viewerTab">
+                                                        <div id="3dviewer" style="height:450px;width:auto;text-align:center;overflow:hidden;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+						</div>
+                    </div>
+				</div>
+			</div>
+		</main>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js" integrity="sha512-h9kKZlwV1xrIcr2LwAPZhjlkx+x62mNwuQK5PAu9d3D+JXMNlGx8akZbqpXvp0vA54rz+DrqYVrzUGDMhwKmwQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" integrity="sha512-NiWqa2rceHnN3Z5j6mSAvbwwg3tiwVNxiAQaaSMSXnRRDh5C2mk/+sKQRw8qjV1vN4nf8iK2a0b048PnHbyx+Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.0.1/d3.v3.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/ngl@2.1.0/dist/ngl.min.js"></script>
+        <script type="text/javascript" src="static/viewer.js"></script>
+		<script>
+			$(document).ready(function(){
+				$('#nav-mobile').sidenav();
+                $(".dropdown-trigger").dropdown();
+                $('.tooltipped').tooltip();
+                $(".modal").modal();
+                $('select').formSelect();
+
+                var pdb_uri = "static/protein.pdb";
+                structure3DApp.init("3dviewer", pdb_uri);
+
+                $("#helperTextA-trigger").on("click", function(){
+                    if($("#helperTextA").hasClass("hide")){
+                        $("#helperTextA").removeClass("hide");
+                        $(this).removeClass("lighten-5");
+                        $(this).removeClass("blue-grey-text");
+                        $(this).addClass("white-text");
+                    }
+                    else{
+                        $("#helperTextA").addClass("hide");
+                        $(this).addClass("lighten-5");
+                        $(this).addClass("blue-grey-text");
+                        $(this).removeClass("white-text");
+                    }
+                });
+
+                $("#viewerHelper-trigger").on("click", function(){
+                    if($("#viewerHelper").hasClass("hide")){
+                        $("#viewerHelper").removeClass("hide");
+                        $(this).removeClass("lighten-5");
+                        $(this).removeClass("blue-grey-text");
+                        $(this).addClass("white-text");
+                    }
+                    else{
+                        $("#viewerHelper").addClass("hide");
+                        $(this).addClass("lighten-5");
+                        $(this).addClass("blue-grey-text");
+                        $(this).removeClass("white-text");
+                    }
+                });
+			});
+		</script>
+	</body>
+</html>

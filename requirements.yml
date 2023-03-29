@@ -1,0 +1,8 @@
+name: 3dviewer
+channels:
+  - defaults
+dependencies:
+  - python=3.10.10
+  - pip
+  - pip:
+    - simple-http-server
